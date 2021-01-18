@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static unsigned int borderpx  = 1;        /* border pixel of windows */
+static unsigned int borderpx  = 2;        /* border pixel of windows */
 static unsigned int snap      = 32;       /* snap pixel */
 static int showbar            = 1;        /* 0 means no bar */
 static int topbar             = 1;        /* 0 means bottom bar */
@@ -20,7 +20,7 @@ static char *colors[][3] = {
 };
 
 /* tagging */
-static const char *tags[] = { "", "", "", "", "",  "", };
+static const char *tags[] = { "", "", "", "", "",  "", };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -40,7 +40,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static int nmaster     = 1;    /* number of clients in master area */
-static int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
+static int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
@@ -69,19 +69,19 @@ static const char *termcmd[]  = { "st", NULL };
  * Xresources preferences to load at startup
  */
 ResourcePref resources[] = {
-		{ "normbgcolor",        STRING,  &normbgcolor },
-		{ "normbordercolor",    STRING,  &normbordercolor },
-		{ "normfgcolor",        STRING,  &normfgcolor },
-		{ "selbgcolor",         STRING,  &selbgcolor },
-		{ "selbordercolor",     STRING,  &selbordercolor },
-		{ "selfgcolor",         STRING,  &selfgcolor },
-		{ "borderpx",          	INTEGER, &borderpx },
-		{ "snap",          	INTEGER, &snap },
-		{ "showbar",          	INTEGER, &showbar },
-		{ "topbar",          	INTEGER, &topbar },
-		{ "nmaster",          	INTEGER, &nmaster },
-		{ "resizehints",       	INTEGER, &resizehints },
-		{ "mfact",		FLOAT,   &mfact },
+		{ "background",	 STRING,  &normbgcolor },
+		{ "color8",	 STRING,  &normbordercolor },
+		{ "foreground",	 STRING,  &normfgcolor },
+		{ "color8",	 STRING,  &selbgcolor },
+		{ "color15",	 STRING,  &selbordercolor },
+		{ "color15",	 STRING,  &selfgcolor },
+		{ "borderpx",	 INTEGER, &borderpx },
+		{ "snap",	 INTEGER, &snap },
+		{ "showbar",	 INTEGER, &showbar },
+		{ "topbar",	 INTEGER, &topbar },
+		{ "nmaster",	 INTEGER, &nmaster },
+		{ "resizehints", INTEGER, &resizehints },
+		{ "mfact",	 FLOAT,   &mfact },
 };
 
 static Key keys[] = {

@@ -5,8 +5,8 @@ static unsigned int borderpx  = 2;        /* border pixel of windows */
 static unsigned int snap      = 32;       /* snap pixel */
 static int showbar            = 1;        /* 0 means no bar */
 static int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10" };
-static const char dmenufont[]       = "monospace:size=10";
+static const char *fonts[]          = { "display:size=10" };
+static const char dmenufont[]       = "display:size=10";
 static char normbgcolor[]           = "#222222";
 static char normbordercolor[]       = "#444444";
 static char normfgcolor[]           = "#bbbbbb";
@@ -70,7 +70,7 @@ static const char *termcmd[]  = { "st", NULL };
  */
 ResourcePref resources[] = {
 		{ "background",	 STRING,  &normbgcolor },
-		{ "color8",	 STRING,  &normbordercolor },
+		{ "background",	 STRING,  &normbordercolor },
 		{ "foreground",	 STRING,  &normfgcolor },
 		{ "color8",	 STRING,  &selbgcolor },
 		{ "color15",	 STRING,  &selbordercolor },

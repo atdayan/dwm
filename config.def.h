@@ -28,17 +28,17 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class		instance	title		tags mask	isfloating	monitor */
-	{ "Zathura",		NULL,		NULL,		1 << 1,		0,		0 },
-	{ NULL,			"Navigator",	NULL,		1 << 2,		0,		0 },
-	{ NULL,			NULL,		"lf",		1 << 3,		0,		0 },
-	{ NULL,			NULL,		"mutt",		1 << 4,		0,		0 },
-	{ "TelegramDesktop",	NULL,		NULL,		1 << 5,		0,		0 },
-	{ "discord",		NULL,		NULL,		1 << 5,		0,		0 },
-	{ "whatsdesk",		NULL,		NULL,		1 << 5,		0,		0 },
+	{ "Zathura",		NULL,		NULL,		1 << 1,		0,      -1 },
+	{ NULL,			"Navigator",	NULL,		1 << 2,		0,      -1 },
+	{ NULL,			    NULL,    	"lf",		1 << 3,		0,      -1 },
+	{ NULL,			    NULL,    	"mutt",		1 << 4,		0,      -1 },
+	{ "TelegramDesktop",NULL,   	NULL,		1 << 5,		0,      -1 },
+	{ "discord",		NULL,		NULL,		1 << 5,		0,      -1 },
+	{ "whatsdesk",		NULL,		NULL,		1 << 5,		0,      -1 },
 };
 
 /* layout(s) */
-static float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static float mfact     = 0.50; /* factor of master area size [0.05..0.95] */
 static int nmaster     = 1;    /* number of clients in master area */
 static int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 

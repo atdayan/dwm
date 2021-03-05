@@ -20,7 +20,7 @@ static char *colors[][3] = {
 };
 
 /* tagging */
-static const char *tags[] = { "", "", "", "", "",  "", };
+static const char *tags[] = { "", "", "", "", "", "",  "", };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -32,9 +32,9 @@ static const Rule rules[] = {
 	{ NULL,			"Navigator",	NULL,		1 << 2,		0,      -1 },
 	{ NULL,			    NULL,    	"lf",		1 << 3,		0,      -1 },
 	{ NULL,			    NULL,    	"mutt",		1 << 4,		0,      -1 },
-	{ "TelegramDesktop",NULL,   	NULL,		1 << 5,		0,      -1 },
-	{ "discord",		NULL,		NULL,		1 << 5,		0,      -1 },
-	{ "whatsdesk",		NULL,		NULL,		1 << 5,		0,      -1 },
+    { "mpv",			NULL,       NULL,		1 << 5,		0,      -1 },
+	{ "TelegramDesktop",NULL,   	NULL,		1 << 6,		0,      -1 },
+	{ "discord",		NULL,		NULL,		1 << 6,		0,      -1 },
 };
 
 /* layout(s) */

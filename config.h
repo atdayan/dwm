@@ -42,15 +42,15 @@ static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 0; /* 1 will force focus on the fullscreen window */
-static int attachbelow = 1;    /* 1 means attach at the end */
+static int attachbelow = 0;          /* 1 means attach at the end */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
-	{ "[D]",      deck },
 	{ "HHH",      grid },
+	{ "[D]",      deck },
 	{ "|M|",      centeredmaster },
 	{ ">M>",      centeredfloatingmaster },
 };
@@ -73,41 +73,32 @@ static const char *logoutcmd[]  = { "killall", "xinit", NULL };
 
 static Key keys[] = {
 	/* modifier             key                function        argument */
-	{ MODKEY,               XK_Return,         spawn,          SHCMD("$TERMINAL") },
-	{ MODKEY,               XK_w,              spawn,          SHCMD("$BROWSER") },
-	{ MODKEY,               XK_d,              spawn,          {.v = dmenucmd } },
 	{ MODKEY,               XK_b,              togglebar,      {0} },
 	{ MODKEY,               XK_j,              focusstack,     {.i = +1 } },
 	{ MODKEY,               XK_k,              focusstack,     {.i = -1 } },
 	{ MODKEY|ShiftMask,     XK_j,              movestack,      {.i = +1 } },
 	{ MODKEY|ShiftMask,     XK_k,              movestack,      {.i = -1 } },
-	{ MODKEY,               XK_bracketright,   incnmaster,     {.i = +1 } },
-	{ MODKEY,               XK_bracketleft,    incnmaster,     {.i = -1 } },
+	{ MODKEY,               XK_apostrophe,     incnmaster,     {.i = +1 } },
+	{ MODKEY|ShiftMask,     XK_apostrophe,     incnmaster,     {.i = -1 } },
 	{ MODKEY,               XK_h,              setmfact,       {.f = -0.05} },
 	{ MODKEY,               XK_l,              setmfact,       {.f = +0.05} },
     { MODKEY,               XK_period,         shiftview,      { .i = +1 } },
     { MODKEY,               XK_comma,          shiftview,      { .i = -1 } },
 	{ MODKEY,               XK_z,              zoom,           {0} },
 	{ MODKEY,               XK_Tab,            view,           {0} },
+    { MODKEY,               XK_space,          swapfocus,      {0} },
     { MODKEY,               XK_grave,          toggleattach,   {0} },
 	{ MODKEY,               XK_q,              killclient,     {0} },
 	{ MODKEY|ShiftMask,     XK_q,              killunsel,      {0} },
-    { MODKEY,               XK_space,          swapfocus,      {0} },
-	{ MODKEY,               XK_t,              setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,               XK_f,              setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,               XK_m,              setlayout,      {.v = &layouts[2]} },
-	{ MODKEY,               XK_r,              setlayout,      {.v = &layouts[3]} },
-	{ MODKEY,               XK_g,              setlayout,      {.v = &layouts[4]} },
-	{ MODKEY,               XK_u,              setlayout,      {.v = &layouts[5]} },
-	{ MODKEY,               XK_o,              setlayout,      {.v = &layouts[6]} },
-	{ MODKEY,               XK_space,          setlayout,      {0} },
-	{ MODKEY|ShiftMask,     XK_space,          togglefloating, {0} },
+	{ MODKEY,               XK_p,              setlayout,      {.v = &layouts[0]} }, // tiled
+	{ MODKEY,               XK_f,              setlayout,      {.v = &layouts[1]} }, // floating
+	{ MODKEY,               XK_y,              setlayout,      {.v = &layouts[2]} }, // monocle
+	{ MODKEY,               XK_g,              setlayout,      {.v = &layouts[3]} }, // grid
+	{ MODKEY,               XK_c,              setlayout,      {.v = &layouts[4]} }, // deck
+	{ MODKEY,               XK_r,              setlayout,      {.v = &layouts[5]} }, // centeredmaster
+	{ MODKEY|ShiftMask,     XK_r,              setlayout,      {.v = &layouts[6]} }, // centeredfloatingmaster
 	{ MODKEY,               XK_0,              view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,     XK_0,              tag,            {.ui = ~0 } },
-//	{ MODKEY,               XK_comma,          focusmon,       {.i = -1 } },
-//	{ MODKEY,               XK_period,         focusmon,       {.i = +1 } },
-//	{ MODKEY|ShiftMask,     XK_comma,          tagmon,         {.i = -1 } },
-//	{ MODKEY|ShiftMask,     XK_period,         tagmon,         {.i = +1 } },
 	TAGKEYS(                XK_1,                              0)
 	TAGKEYS(                XK_2,                              1)
 	TAGKEYS(                XK_3,                              2)
@@ -119,6 +110,13 @@ static Key keys[] = {
 	TAGKEYS(                XK_9,                              8)
 	{ MODKEY,               XK_Delete,         quit,           {0} },
 	{ MODKEY|ShiftMask,     XK_Delete,         spawn,          {.v = logoutcmd } },
+
+    /*start applications*/
+	{ MODKEY,               XK_Return,         spawn,          SHCMD("$TERMINAL") },
+	{ MODKEY|ShiftMask,     XK_Return,         spawn,          {.v = dmenucmd } },
+	{ MODKEY,               XK_w,              spawn,          SHCMD("$BROWSER") },
+	{ MODKEY|ShiftMask,     XK_w,              spawn,          SHCMD("$BROWSER --private-window") },
+	{ MODKEY,               XK_F1,             spawn,          SHCMD("st -d $XDG_SOURCE_HOME") },
 };
 
 /* button definitions */

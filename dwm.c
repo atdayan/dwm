@@ -136,7 +136,6 @@ struct Monitor {
 	Client *clients;
 	Client *sel;
 	Client *stack;
-	Client *tagmarked[32];
 	Monitor *next;
 	Window barwin;
 	const Layout *lt[2];
@@ -160,6 +159,8 @@ static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interac
 static void arrange(Monitor *m);
 static void arrangemon(Monitor *m);
 static void attach(Client *c);
+static void attachBelow(Client *c);
+static void toggleattach();
 static void attachstack(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
@@ -182,7 +183,6 @@ static void expose(XEvent *e);
 static Client *findbefore(Client *c);
 static void focus(Client *c);
 static void focusin(XEvent *e);
-static void focusmaster(const Arg *arg);
 //static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
@@ -227,6 +227,7 @@ static void shiftview(const Arg *arg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
+static void swapfocus();
 static void tag(const Arg *arg);
 //static void tagmon(const Arg *arg);
 static void tile(Monitor *);
@@ -265,6 +266,7 @@ static pid_t winpid(Window w);
 
 /* variables */
 static Client *prevzoom = NULL;
+static Client *prevclient = NULL;
 static const char broken[] = "broken";
 static char stext[256];
 static int screen;
@@ -446,6 +448,26 @@ attach(Client *c)
 {
 	c->next = c->mon->clients;
 	c->mon->clients = c;
+}
+void
+attachBelow(Client *c)
+{
+	//If there is nothing on the monitor or the selected client is floating, attach as normal
+	if(c->mon->sel == NULL || c->mon->sel == c || c->mon->sel->isfloating) {
+		attach(c);
+		return;
+	}
+
+	//Set the new client's next property to the same as the currently selected clients next
+	c->next = c->mon->sel->next;
+	//Set the currently selected clients next property to the new client
+	c->mon->sel->next = c;
+
+}
+
+void toggleattach()
+{
+	attachbelow = !attachbelow;
 }
 
 void
@@ -793,10 +815,6 @@ detach(Client *c)
 {
 	Client **tc;
 
-	for (int i = 1; i < LENGTH(tags); i++)
-		if (c == c->mon->tagmarked[i])
-			c->mon->tagmarked[i] = NULL;
-
 	for (tc = &c->mon->clients; *tc && *tc != c; tc = &(*tc)->next);
 	*tc = c->next;
 }
@@ -961,34 +979,6 @@ focusin(XEvent *e)
 
 	if (selmon->sel && ev->window != selmon->sel->win)
 		setfocus(selmon->sel);
-}
-
-void
-focusmaster(const Arg *arg)
-{
-	Client *master;
-
-	if (selmon->nmaster > 1)
-		return;
-	if (!selmon->sel || (selmon->sel->isfullscreen && lockfullscreen))
-		return;
-
-	master = nexttiled(selmon->clients);
-
-	if (!master)
-		return;
-
-	int i;
-	for (i = 0; !(selmon->tagset[selmon->seltags] & 1 << i); i++);
-	i++;
-
-	if (selmon->sel == master) {
-		if (selmon->tagmarked[i] && ISVISIBLE(selmon->tagmarked[i]))
-			focus(selmon->tagmarked[i]);
-	} else {
-		selmon->tagmarked[i] = selmon->sel;
-		focus(master);
-	}
 }
 
 void
@@ -1291,7 +1281,10 @@ manage(Window w, XWindowAttributes *wa)
 		c->isfloating = c->oldstate = trans != None || c->isfixed;
 	if (c->isfloating)
 		XRaiseWindow(dpy, c->win);
-	attach(c);
+	if( attachbelow )
+		attachBelow(c);
+	else
+		attach(c);
 	attachstack(c);
 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
 		(unsigned char *) &(c->win), 1);
@@ -1480,11 +1473,6 @@ nexttiled(Client *c)
 void
 pop(Client *c)
 {
-	int i;
-	for (i = 0; !(selmon->tagset[selmon->seltags] & 1 << i); i++);
-	i++;
-
-	c->mon->tagmarked[i] = nexttiled(c->mon->clients);
 	detach(c);
 	attach(c);
 	focus(c);
@@ -1712,7 +1700,10 @@ sendmon(Client *c, Monitor *m)
 	detachstack(c);
 	c->mon = m;
 	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
-	attach(c);
+	if( attachbelow )
+		attachBelow(c);
+	else
+		attach(c);
 	attachstack(c);
 	focus(NULL);
 	arrange(NULL);
@@ -1952,6 +1943,17 @@ spawn(const Arg *arg)
 }
 
 void
+swapfocus()
+{
+	Client *c;
+	for(c = selmon->clients; c && c != prevclient; c = c->next) ;
+	if(c == prevclient) {
+		focus(prevclient);
+		restack(prevclient->mon);
+	}
+}
+
+void
 tag(const Arg *arg)
 {
 	if (selmon->sel && arg->ui & TAGMASK) {
@@ -2068,6 +2070,7 @@ unfocus(Client *c, int setfocus)
 {
 	if (!c)
 		return;
+	prevclient = c;
 	grabbuttons(c, 0);
 	XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColBorder].pixel);
 	if (setfocus) {
@@ -2231,7 +2234,10 @@ updategeom(void)
 					m->clients = c->next;
 					detachstack(c);
 					c->mon = mons;
-					attach(c);
+					if( attachbelow )
+						attachBelow(c);
+					else
+						attach(c);
 					attachstack(c);
 				}
 				if (m == selmon)
@@ -2599,6 +2605,7 @@ zoom(const Arg *arg)
 {
 	Client *c = selmon->sel;
 	Client *at = NULL, *cold, *cprevious = NULL;
+	prevclient = nexttiled(selmon->clients);
 
 	if (!selmon->lt[selmon->sellt]->arrange
 	|| (selmon->sel && selmon->sel->isfloating))
@@ -2609,7 +2616,7 @@ zoom(const Arg *arg)
 			cprevious = nexttiled(at->next);
 		if (!cprevious || cprevious != prevzoom) {
 			prevzoom = NULL;
-			if (!c || !(c = nexttiled(c->next)))
+		if (!c || !(c = prevclient = nexttiled(c->next)))
 				return;
 		} else
 			c = cprevious;

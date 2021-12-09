@@ -42,6 +42,7 @@ static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 0; /* 1 will force focus on the fullscreen window */
+static int attachbelow = 1;    /* 1 means attach at the end */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
@@ -88,9 +89,10 @@ static Key keys[] = {
     { MODKEY,               XK_comma,          shiftview,      { .i = -1 } },
 	{ MODKEY,               XK_z,              zoom,           {0} },
 	{ MODKEY,               XK_Tab,            view,           {0} },
+    { MODKEY,               XK_grave,          toggleattach,   {0} },
 	{ MODKEY,               XK_q,              killclient,     {0} },
 	{ MODKEY|ShiftMask,     XK_q,              killunsel,      {0} },
-    //{ MODKEY|ControlMask,   XK_space,          focusmaster,    {0} },
+    { MODKEY,               XK_space,          swapfocus,      {0} },
 	{ MODKEY,               XK_t,              setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,               XK_f,              setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,               XK_m,              setlayout,      {.v = &layouts[2]} },

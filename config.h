@@ -29,12 +29,13 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class     instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
-	{ "Gimp",    NULL,     NULL,           0,         1,          0,           0,        -1 },
-	{ "discord", NULL,     NULL,           1 << 7,    0,          0,          -1,        -1 },
-	{ "firefox", NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
-	{ "St",      NULL,     NULL,           0,         0,          1,           0,        -1 },
-	{ NULL,      NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
+	/* class          instance  title           tags mask  iscentered isfloating  isterminal  noswallow  monitor */
+	{ "Gimp",         NULL,     NULL,           0,           0,          1,          0,           0,        -1 },
+	{ "discord",      NULL,     NULL,           1 << 7,      0,          0,          0,          -1,        -1 },
+	{ "firefox",      NULL,     NULL,           1 << 8,      0,          0,          0,          -1,        -1 },
+	{ "Pavucontrol",  NULL,     NULL,           0,           1,          1,          0,           0,        -1 },
+	{ "St",           NULL,     NULL,           0,           0,          0,          1,           0,        -1 },
+	{ NULL,           NULL,     "Event Tester", 0,           0,          0,          0,           1,        -1 }, /* xev */
 };
 
 /* layout(s) */
@@ -87,6 +88,7 @@ static Key keys[] = {
 	{ MODKEY,               XK_z,              zoom,           {0} },
 	{ MODKEY,               XK_Tab,            view,           {0} },
     { MODKEY,               XK_space,          swapfocus,      {0} },
+    { MODKEY|ShiftMask,     XK_space,          togglefloating, {0} },
     { MODKEY,               XK_grave,          toggleattach,   {0} },
 	{ MODKEY,               XK_q,              killclient,     {0} },
 	{ MODKEY|ShiftMask,     XK_q,              killunsel,      {0} },
@@ -117,6 +119,7 @@ static Key keys[] = {
 	{ MODKEY,               XK_w,              spawn,          SHCMD("$BROWSER") },
 	{ MODKEY|ShiftMask,     XK_w,              spawn,          SHCMD("$BROWSER --private-window") },
 	{ MODKEY,               XK_F1,             spawn,          SHCMD("st -d $XDG_SOURCE_HOME") },
+	{ MODKEY,               XK_m,              spawn,          SHCMD("pavucontrol") },
 };
 
 /* button definitions */

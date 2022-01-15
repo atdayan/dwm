@@ -136,6 +136,7 @@ struct Monitor {
 	Client *clients;
 	Client *sel;
 	Client *stack;
+	Client *tagmarked[32];
 	Monitor *next;
 	Window barwin;
 	const Layout *lt[2];
@@ -184,6 +185,7 @@ static void expose(XEvent *e);
 static Client *findbefore(Client *c);
 static void focus(Client *c);
 static void focusin(XEvent *e);
+static void focusmaster(const Arg *arg);
 //static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
@@ -228,7 +230,6 @@ static void shiftview(const Arg *arg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
-static void swapfocus();
 static void tag(const Arg *arg);
 //static void tagmon(const Arg *arg);
 static void tile(Monitor *);
@@ -267,7 +268,6 @@ static pid_t winpid(Window w);
 
 /* variables */
 static Client *prevzoom = NULL;
-static Client *prevclient = NULL;
 static const char broken[] = "broken";
 static char stext[256];
 static int screen;
@@ -818,6 +818,10 @@ detach(Client *c)
 {
 	Client **tc;
 
+	for (int i = 1; i < LENGTH(tags); i++)
+		if (c == c->mon->tagmarked[i])
+			c->mon->tagmarked[i] = NULL;
+
 	for (tc = &c->mon->clients; *tc && *tc != c; tc = &(*tc)->next);
 	*tc = c->next;
 }
@@ -982,6 +986,34 @@ focusin(XEvent *e)
 
 	if (selmon->sel && ev->window != selmon->sel->win)
 		setfocus(selmon->sel);
+}
+
+void
+focusmaster(const Arg *arg)
+{
+	Client *master;
+
+	if (selmon->nmaster > 1)
+		return;
+	if (!selmon->sel || (selmon->sel->isfullscreen && lockfullscreen))
+		return;
+
+	master = nexttiled(selmon->clients);
+
+	if (!master)
+		return;
+
+	int i;
+	for (i = 0; !(selmon->tagset[selmon->seltags] & 1 << i); i++);
+	i++;
+
+	if (selmon->sel == master) {
+		if (selmon->tagmarked[i] && ISVISIBLE(selmon->tagmarked[i]))
+			focus(selmon->tagmarked[i]);
+	} else {
+		selmon->tagmarked[i] = selmon->sel;
+		focus(master);
+	}
 }
 
 void
@@ -1480,6 +1512,11 @@ nexttiled(Client *c)
 void
 pop(Client *c)
 {
+	int i;
+	for (i = 0; !(selmon->tagset[selmon->seltags] & 1 << i); i++);
+	i++;
+
+	c->mon->tagmarked[i] = nexttiled(c->mon->clients);
 	detach(c);
 	attach(c);
 	focus(c);
@@ -1892,7 +1929,7 @@ seturgent(Client *c, int urg)
 }
 
 void
-shiftview(const Arg *arg) 
+shiftview(const Arg *arg)
 {
     Arg shifted;
 
@@ -1946,17 +1983,6 @@ spawn(const Arg *arg)
 		fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
 		perror(" failed");
 		exit(EXIT_SUCCESS);
-	}
-}
-
-void
-swapfocus()
-{
-	Client *c;
-	for(c = selmon->clients; c && c != prevclient; c = c->next) ;
-	if(c == prevclient) {
-		focus(prevclient);
-		restack(prevclient->mon);
 	}
 }
 
@@ -2077,7 +2103,6 @@ unfocus(Client *c, int setfocus)
 {
 	if (!c)
 		return;
-	prevclient = c;
 	grabbuttons(c, 0);
 	XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColBorder].pixel);
 	if (setfocus) {
@@ -2614,7 +2639,6 @@ zoom(const Arg *arg)
 {
 	Client *c = selmon->sel;
 	Client *at = NULL, *cold, *cprevious = NULL;
-	prevclient = nexttiled(selmon->clients);
 
 	if (!selmon->lt[selmon->sellt]->arrange
 	|| (selmon->sel && selmon->sel->isfloating))
@@ -2625,7 +2649,7 @@ zoom(const Arg *arg)
 			cprevious = nexttiled(at->next);
 		if (!cprevious || cprevious != prevzoom) {
 			prevzoom = NULL;
-		if (!c || !(c = prevclient = nexttiled(c->next)))
+		if (!c || !(c = nexttiled(c->next)))
 				return;
 		} else
 			c = cprevious;
@@ -2776,3 +2800,4 @@ centeredfloatingmaster(Monitor *m)
 		tx += WIDTH(c);
 	}
 }
+

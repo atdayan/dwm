@@ -87,7 +87,7 @@ static Key keys[] = {
     { MODKEY,               XK_comma,          shiftview,      { .i = -1 } },
 	{ MODKEY,               XK_z,              zoom,           {0} },
 	{ MODKEY,               XK_Tab,            view,           {0} },
-    { MODKEY,               XK_space,          swapfocus,      {0} },
+    { MODKEY,               XK_space,          focusmaster,    {0} },
     { MODKEY|ShiftMask,     XK_space,          togglefloating, {0} },
     { MODKEY,               XK_grave,          toggleattach,   {0} },
 	{ MODKEY,               XK_q,              killclient,     {0} },
@@ -117,8 +117,7 @@ static Key keys[] = {
 	{ MODKEY,               XK_Return,         spawn,          SHCMD("$TERMINAL") },
 	{ MODKEY|ShiftMask,     XK_Return,         spawn,          {.v = dmenucmd } },
 	{ MODKEY,               XK_w,              spawn,          SHCMD("$BROWSER") },
-	{ MODKEY|ShiftMask,     XK_w,              spawn,          SHCMD("$BROWSER --private-window") },
-	{ MODKEY,               XK_F1,             spawn,          SHCMD("st -d $XDG_SOURCE_HOME") },
+	{ MODKEY,               XK_F1,             spawn,          SHCMD("st -d $PROG_SOURCE_HOME") },
 	{ MODKEY,               XK_m,              spawn,          SHCMD("pavucontrol") },
 };
 

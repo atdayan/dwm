@@ -42,7 +42,7 @@ static const Rule rules[] = {
 };
 
 /* layout(s) */
-static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
+static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
@@ -96,10 +96,10 @@ static Key keys[] = {
     { MODKEY,               XK_period,    shiftviewact,       {.i = +1 } },
     { MODKEY|ShiftMask,     XK_comma,     shiftview,          {.i = -1 } },
     { MODKEY|ShiftMask,     XK_period,    shiftview,          {.i = +1 } },
-    //{ MODKEY,               XK_comma,     focusmon,           {.i = -1 } },
-    //{ MODKEY,               XK_period,    focusmon,           {.i = +1 } },
-    //{ MODKEY|ShiftMask,     XK_comma,     tagmon,             {.i = -1 } },
-    //{ MODKEY|ShiftMask,     XK_period,    tagmon,             {.i = +1 } },
+    { MODKEY,               XK_bracketleft,     focusmon,           {.i = -1 } },
+    { MODKEY,               XK_bracketright,    focusmon,           {.i = +1 } },
+    { MODKEY|ShiftMask,     XK_bracketleft,     tagmon,             {.i = -1 } },
+    { MODKEY|ShiftMask,     XK_bracketright,    tagmon,             {.i = +1 } },
     TAGKEYS(                XK_1,                             0)
     TAGKEYS(                XK_2,                             1)
     TAGKEYS(                XK_3,                             2)
@@ -115,6 +115,7 @@ static Key keys[] = {
     { MODKEY,               XK_Return,    spawn,              {.v = termcmd } },
     { MODKEY|ShiftMask,     XK_Return,    spawn,              {.v = dmenucmd } },
     { MODKEY,               XK_w,         spawn,              {.v = browsercmd } },
+    { MODKEY,               XK_p,         spawn,              SHCMD("pavucontrol") },
 };
 
 /* button definitions */

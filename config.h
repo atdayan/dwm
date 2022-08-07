@@ -1,7 +1,9 @@
 /* See LICENSE file for copyright and license details. */
 
+#define TERM "alacritty"
+
 /* appearance */
-static const unsigned int borderpx  = 2;        /* border pixel of windows */
+static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const int showbar            = 0;        /* 0 means no bar */
@@ -16,7 +18,7 @@ static const char col_cyan[]        = "#005577";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+	[SchemeSel]  = { col_gray4, col_cyan,  "#00ff00"/*col_cyan*/  },
 };
 
 /* tagging */
@@ -39,7 +41,7 @@ static const Rule rules[] = {
 static const float mfact     = 0.50; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
-static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
+static const int lockfullscreen = 0; /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
@@ -62,7 +64,7 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "alacritty", NULL };
+static const char *termcmd[]  = { TERM, NULL };
 
 #include <X11/XF86keysym.h>
 #include "shiftview.c"
@@ -93,23 +95,26 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY,                       XK_Delete, quit,           {0} },
+	{ MODKEY,                       XK_Escape, spawn,          SHCMD("slock & xset dpms force off; mpc pause; pauseallmpv") },
+
+    { 0, XF86XK_AudioMute,          spawn,     SHCMD("pamixer -t; kill -44 $(pidof dwmblocks)") },
+    { 0, XF86XK_AudioLowerVolume,   spawn,     SHCMD("pamixer --allow-boost -d 3; kill -44 $(pidof dwmblocks)") },
+    { 0, XF86XK_AudioRaiseVolume,   spawn,     SHCMD("pamixer --allow-boost -i 3; kill -44 $(pidof dwmblocks)") },
+    { 0, XF86XK_AudioMicMute,       spawn,     SHCMD("pactl set-source-mute @DEFAULT_SOURCE@ toggle") },
+    { 0, XF86XK_MonBrightnessDown,  spawn,     {.v = (const char*[]){ "backlight_control", "-10", NULL } } },
+    { 0, XF86XK_MonBrightnessUp,    spawn,     {.v = (const char*[]){ "backlight_control", "+10", NULL } } },
+    { 0, XF86XK_Calculator,		    spawn,	   {.v = (const char*[]){ TERM, "-e", "bc", "-l", NULL } } },
+    { 0, XK_Print,                  spawn,     SHCMD("scrot -s -e 'xclip -selection clipboard -t image/png -i $f && rm $f'") },
+    { 0, XF86XK_AudioPrev,          spawn,     {.v = (const char*[]){ "mpc", "prev", NULL } } },
+    { 0, XF86XK_AudioNext,          spawn,     {.v = (const char*[]){ "mpc",  "next", NULL } } },
+    { 0, XF86XK_AudioPause,         spawn,     {.v = (const char*[]){ "mpc", "pause", NULL } } },
+    { 0, XF86XK_AudioPlay,          spawn,     {.v = (const char*[]){ "mpc", "play", NULL } } },
+    { 0, XF86XK_AudioStop,          spawn,     {.v = (const char*[]){ "mpc", "stop", NULL } } },
+
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
-	{ MODKEY|ShiftMask,             XK_Delete, quit,           {0} },
-
-    { 0, XF86XK_AudioMute,          spawn,      SHCMD("pamixer -t; kill -44 $(pidof dwmblocks)") },
-    { 0, XF86XK_AudioLowerVolume,   spawn,      SHCMD("pamixer --allow-boost -d 3; kill -44 $(pidof dwmblocks)") },
-    { 0, XF86XK_AudioRaiseVolume,   spawn,      SHCMD("pamixer --allow-boost -i 3; kill -44 $(pidof dwmblocks)") },
-    { 0, XF86XK_AudioMicMute,   spawn,      SHCMD("pactl set-source-mute @DEFAULT_SOURCE@ toggle") },
-    { 0, XF86XK_MonBrightnessUp,    spawn,      {.v = (const char*[]){ "backlight_control", "+10", NULL } } },
-    { 0, XF86XK_MonBrightnessDown,  spawn,      {.v = (const char*[]){ "backlight_control", "-10", NULL } } },
-    { 0, XK_Print,   spawn,      SHCMD("scrot -s -e 'xclip -selection clipboard -t image/png -i $f && rm $f'") },
-    { 0, XF86XK_AudioPrev,      spawn,      {.v = (const char*[]){ "mpc", "prev", NULL } } },
-    { 0, XF86XK_AudioNext,      spawn,      {.v = (const char*[]){ "mpc",  "next", NULL } } },
-    { 0, XF86XK_AudioPause,     spawn,      {.v = (const char*[]){ "mpc", "pause", NULL } } },
-    { 0, XF86XK_AudioPlay,      spawn,      {.v = (const char*[]){ "mpc", "play", NULL } } },
-    { 0, XF86XK_AudioStop,      spawn,      {.v = (const char*[]){ "mpc", "stop", NULL } } },
 };
 
 /* button definitions */
